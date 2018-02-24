@@ -50,7 +50,7 @@ namespace lesson1 {
 	void run()
 	{
 		srand(42);
-		const size_t N = 20000000;
+		const size_t N = 50 * 1000 * 1000;
 		const size_t NB = N * sizeof(int);
 
 		auto expected = createHostArray<int>(N);
@@ -66,18 +66,29 @@ namespace lesson1 {
 		auto c = createHostArray<int>(N);
 
 		cout << "runAdd1" << endl;
+		cudaEvent_t start, stop;
+		float time1, time2;
+		createTimer(&start, &stop, &time1);
+		startTimer(start);
 		runAdd1(a, b, c, N, NB);
+		stopTimer(start, stop, time1);
 		assert(arraysEqual(expected, c, N));
 		checkHostMatrix<int>(c, 1, 1, DebugPrintArrayCount, "%d ", "c");
 
 		cout << "runAdd2" << endl;
+		startTimer(start);
 		runAdd2(a, b, c, N, NB);
+		stopTimer(start, stop, time2);
 		assert(arraysEqual(expected, c, N));
 		checkHostMatrix<int>(c, 1, 1, DebugPrintArrayCount, "%d ", "c");
+
+		cout << "elapsed time (linear): " << time1 << "ms" << endl;
+		cout << "elapsed time (linear with unroll): " << time2 << "ms" << endl;
 
 		delete[] a;
 		delete[] b;
 		delete[] c;
+		destroyTimer(start, stop);
 	}
 
 	template<typename T>
