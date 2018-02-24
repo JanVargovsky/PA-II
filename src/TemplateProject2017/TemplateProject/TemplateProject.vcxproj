@@ -19,9 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="Lesson1.cu" />
     <CudaCompile Include="Runner.cu">
       <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compute_61,sm_61</CodeGeneration>
     </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Lesson1.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AD6DD254-AD9D-4168-BF1F-CC32C8CEAD58}</ProjectGuid>
