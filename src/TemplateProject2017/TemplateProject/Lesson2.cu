@@ -1,11 +1,11 @@
 #include "Lesson2.h"
 #include <cudaDefs.h>
+#include <cassert>
 
 namespace lesson2 {
-	//const size_t N = 10;
-	const size_t Rows = 10;
-	const size_t Cols = 5;
-	const size_t BlockSize = 2;
+	const size_t Rows = 15;
+	const size_t Cols = 20;
+	const size_t BlockSize = 3;
 
 	__global__ void fill(int* matrix, size_t rows, size_t cols, size_t pitch)
 	{
@@ -14,9 +14,9 @@ namespace lesson2 {
 		if (row >= rows || col >= cols)
 			return;
 
-		int index = col * pitch + row;
+		int index = row * pitch + col;
 		int value = col * rows + row;
-		printf("r=%-5d c=%-5d index=%-5d v=%-5d\n", col, row, index, value);
+		//printf("r=%-5d c=%-5d index=%-5d v=%-5d\n", row, col, index, value);
 		matrix[index] = value;
 	}
 
@@ -27,29 +27,47 @@ namespace lesson2 {
 		if (row >= rows || col >= cols)
 			return;
 
-		int index = col * pitch + row;
+		int index = row * pitch + col;
 		int value = col * rows + row;
 		matrix[index]++;
+	}
+
+	template<typename T>
+	bool arraysEqual(T *a, T *b, size_t length)
+	{
+		for (size_t i = 0; i < length; i++)
+			if (a[i] != b[i])
+				return false;
+		return true;
 	}
 
 	void run()
 	{
 		int *dMatrix;
 		size_t pitchInBytes = 0;
-		size_t rowsInBytes = Cols * sizeof(int);
-		checkCudaErrors(cudaMallocPitch((void**)&dMatrix, &pitchInBytes, rowsInBytes, Rows));
+		checkCudaErrors(cudaMallocPitch((void**)&dMatrix, &pitchInBytes, Cols * sizeof(int), Rows));
 		size_t pitch = pitchInBytes / sizeof(int);
 		dim3 grid = dim3(getNumberOfParts(Rows, BlockSize), getNumberOfParts(Cols, BlockSize));
 		dim3 block = dim3(BlockSize, BlockSize);
 
 		fill << <grid, block >> > (dMatrix, Rows, Cols, pitch);
-		checkDeviceMatrix(dMatrix, pitchInBytes, Cols, Rows, "%-3d ", "dMatrix");
+		checkDeviceMatrix(dMatrix, pitchInBytes, Rows, Cols, "%-3d ", "dMatrix");
 
 		increment << <grid, block >> > (dMatrix, Rows, Cols, pitch);
-		checkDeviceMatrix(dMatrix, pitchInBytes, Cols, Rows, "%-3d ", "dMatrix");
+		checkDeviceMatrix(dMatrix, pitchInBytes, Rows, Cols, "%-3d ", "dMatrix");
 
-		int *matrix = new int[Rows * Cols];
-		checkCudaErrors(cudaMemcpy2D(matrix, Rows * sizeof(int), dMatrix, pitchInBytes, Rows * sizeof(int), Cols, cudaMemcpyKind::cudaMemcpyDeviceToHost));
-		checkHostMatrix(matrix, Rows * sizeof(int), Cols, Rows, "%-3d ", "matrix");
+		int *expectedMatrix = new int[Rows * Cols];
+		for (size_t i = 0; i < Rows * Cols; i++)
+			expectedMatrix[i] = i + 1;
+
+		int *matrix = new int[pitch * Rows];
+		checkCudaErrors(cudaMemcpy2D(matrix, pitchInBytes, dMatrix, pitchInBytes, Cols * sizeof(int), Rows, cudaMemcpyKind::cudaMemcpyDeviceToHost));
+		checkHostMatrix(matrix, pitchInBytes, Rows, Cols, "%-3d ", "matrix");
+
+		//assert(arraysEqual(expectedMatrix, matrix, Rows * Cols));
+		
+		delete[] matrix;
+		delete[] expectedMatrix;
+		cudaFree(dMatrix);
 	}
 }
