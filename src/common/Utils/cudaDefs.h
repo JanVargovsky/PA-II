@@ -1,10 +1,10 @@
-#ifndef __UTILS_H
-#define __UTILS_H
+#pragma once
 
 #include <stdio.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
+#include <helper_functions.h>
 #include <helper_cuda.h>
 #include <helper_math.h>
 #include <vector_types.h>
@@ -14,6 +14,8 @@
 
 #define FLOAT_EPSILON 0.0001
 
+//#define SWAP(a, b) {a ^= b; b ^= a; a ^= b;}
+#define SWAP(a, b) (a^=b^=a^=b)
 #define MINIMUM(a, b) ((a) < (b) ? (a) : (b))
 #define MAXIMUM(a, b) ((a) > (b) ? (a) : (b))
 #define CLIP(a, b, c) MINIMUM(MAXIMUM((a), (b)), (c))					//a = your value, b = left bound, c = rightbound
@@ -22,12 +24,12 @@
 #define NOTININTERVAL(first,last,x) ((x<first)||(last<x))
 #define CHECK_ZERO(x) ((x < FLOAT_EPSILON) || (-x > FLOAT_EPSILON))
 
-#define SAFE_DELETE(p) if(p){delete (p);(p)=0;}
-#define SAFE_DELETE_ARRAY(p) if(p){delete[] (p);(p)=0;}
+#define SAFE_DELETE(p) if(p){delete (p);(p)=nullptr;}
+#define SAFE_DELETE_ARRAY(p) if(p){delete[] (p);(p)=nullptr;}
 
-#define SAFE_DELETE_CUDA(p) if(p){cudaFree(p);(p)=0;}
-#define SAFE_DELETE_CUDAARRAY(p) if(p){cudaFreeArray(p);(p)=0;}
-#define SAFE_DELETE_CUDAHOST(p) if(p){cudaFreeHost(p);(p)=0;}
+#define SAFE_DELETE_CUDA(p) if(p){cudaFree(p);(p)=nullptr;}
+#define SAFE_DELETE_CUDAARRAY(p) if(p){cudaFreeArray(p);(p)=nullptr;}
+#define SAFE_DELETE_CUDAHOST(p) if(p){cudaFreeHost(p);(p)=nullptr;}
 
 #define GET_K_BIT(n, k) ((n >> k) & 1)
 
@@ -123,14 +125,15 @@ template< class T> __host__ void checkDeviceMatrix(const T *m, const unsigned in
 	T *ptr;
 	checkCudaErrors(cudaHostAlloc((void**)&ptr, pitchInBytes * rows, cudaHostAllocWriteCombined));
 	checkCudaErrors(cudaMemcpy(ptr, m, rows * pitchInBytes, cudaMemcpyDeviceToHost));
+	T *p = ptr;
 	for (unsigned int i=0; i<rows; i++)
 	{
 		for (unsigned int j=0; j<cols; j++)
 		{
-			printf(format, ptr[j]);
+			printf(format, p[j]);
 		}
 		printf("\n");
-		ptr = (T*)(((char*)ptr)+pitchInBytes);
+		p = (T*)(((char*)p)+pitchInBytes);
 	}
 	cudaFreeHost(ptr);
 #endif
@@ -144,14 +147,15 @@ template< class T> __host__ void checkDeviceArray(const cudaArray *m, const unsi
 	T *ptr;
 	checkCudaErrors(cudaHostAlloc((void**)&ptr, pitchInBytes * rows, cudaHostAllocWriteCombined));
 	checkCudaErrors(cudaMemcpyFromArray(ptr, m, 0, 0, rows * pitchInBytes, cudaMemcpyDeviceToHost));
+	T *p = ptr;
 	for (unsigned int i = 0; i<rows; i++)
 	{
 		for (unsigned int j = 0; j<cols; j++)
 		{
-			printf(format, ptr[j]);
+			printf(format, p[j]);
 		}
 		printf("\n");
-		ptr = (T*)(((char*)ptr) + pitchInBytes);
+		p = (T*)(((char*)p) + pitchInBytes);
 	}
 	cudaFreeHost(ptr);
 #endif
@@ -178,14 +182,15 @@ template< class T> __host__ void verifyDeviceMatrix(const T *m, const unsigned i
 	T *ptr;
 	checkCudaErrors(cudaHostAlloc((void**)&ptr, pitchInBytes * rows, cudaHostAllocWriteCombined));
 	checkCudaErrors(cudaMemcpy(ptr, m, rows * pitchInBytes, cudaMemcpyDeviceToHost));
+	T *p = ptr;
 	for (unsigned int i=0; i<rows; i++)
 	{
 		for (unsigned int j=0; j<cols; j++)
 		{
-			printf("%c", ISININTERVAL(minValue, maxValue, ptr[j]) ? ' ' : 'x');
+			printf("%c", ISININTERVAL(minValue, maxValue, p[j]) ? ' ' : 'x');
 		}
 		printf("\n");
-		ptr = (T*)(((char*)ptr)+pitchInBytes);
+		p = (T*)(((char*)p)+pitchInBytes);
 	}
 	cudaFreeHost(ptr);
 #endif
@@ -323,43 +328,44 @@ __forceinline__  __host__ bool checkDeviceProperties()
 	#if CUDART_VERSION >= 2020
 		int driverVersion = 0, runtimeVersion = 0;
 		cudaDriverGetVersion(&driverVersion);
-		printf("  CUDA Driver Version:                           %d.%d\n", driverVersion/1000, driverVersion%100);
+		printf("  %-50s: %d.%d\n", "CUDA Driver Version", driverVersion/1000, driverVersion%100);
+		
 		cudaRuntimeGetVersion(&runtimeVersion);
-		printf("  CUDA Runtime Version:                          %d.%d\n", runtimeVersion/1000, runtimeVersion%100);
+		printf("  %-50s: %d.%d\n", "CUDA Runtime Version", runtimeVersion/1000, runtimeVersion%100);
 	#endif
-		printf("  CUDA Capability Major revision number:         %d\n", deviceProp.major);
-		printf("  CUDA Capability Minor revision number:         %d\n", deviceProp.minor);
+		printf("  %-50s: %d\n", "CUDA Capability Major revision number",	deviceProp.major);
+		printf("  %-50s: %d\n", "CUDA Capability Minor revision number",	deviceProp.minor);
 	#if CUDART_VERSION >= 2000
-		printf("  Number of multiprocessors:                     %d\n", deviceProp.multiProcessorCount);
-		printf("  Number of cores:                               %d\n", 8 * deviceProp.multiProcessorCount);
+		printf("  %-50s: %d\n", "Number of multiprocessors",	deviceProp.multiProcessorCount);
+		printf("  %-50s: %d\n", "Number of cores", 8 * deviceProp.multiProcessorCount);
 	#endif
-		printf("  Total amount of global memory:                 %lu bytes\n", deviceProp.totalGlobalMem);
-		printf("  Total amount of constant memory:               %lu bytes\n", deviceProp.totalConstMem);
-		printf("  Total amount of shared memory per SM:			 %lu bytes\n", deviceProp.sharedMemPerMultiprocessor);
-		printf("  Total amount of shared memory per block:       %lu bytes\n", deviceProp.sharedMemPerBlock);
-		printf("  Total number of registers available per SM:	 %d\n", deviceProp.regsPerMultiprocessor);
-		printf("  Total number of registers available per block: %d\n", deviceProp.regsPerBlock);
-		printf("  Warp size:                                     %d\n", deviceProp.warpSize);
-		printf("  Maximum number of threads per block:           %d\n", deviceProp.maxThreadsPerBlock);
-		printf("  Maximum sizes of each dimension of a block:    %d x %d x %d\n",
+		printf("  %-50s: %u Mb\n", "Total amount of global memory", static_cast<unsigned int>(deviceProp.totalGlobalMem >> 20));
+		printf("  %-50s: %llu bytes\n", "Total amount of constant memory", deviceProp.totalConstMem);
+		printf("  %-50s: %llu bytes\n", "Total amount of shared memory per SM", deviceProp.sharedMemPerMultiprocessor);
+		printf("  %-50s: %llu bytes\n", "Total amount of shared memory per block", deviceProp.sharedMemPerBlock);
+		printf("  %-50s: %d\n", "Total number of registers available per SM", deviceProp.regsPerMultiprocessor);
+		printf("  %-50s: %d\n", "Total number of registers available per block", deviceProp.regsPerBlock);
+		printf("  %-50s: %d\n", "Warp size", deviceProp.warpSize);
+		printf("  %-50s: %d\n", "Maximum number of threads per block", deviceProp.maxThreadsPerBlock);
+		printf("  %-50s: %d x %d x %d\n", "Maximum sizes of each dimension of a block",
 			   deviceProp.maxThreadsDim[0],
 			   deviceProp.maxThreadsDim[1],
 			   deviceProp.maxThreadsDim[2]);
-		printf("  Maximum sizes of each dimension of a grid:     %d x %d x %d\n",
+		printf("  %-50s: %d x %d x %d\n", "Maximum sizes of each dimension of a grid", 
 			   deviceProp.maxGridSize[0],
 			   deviceProp.maxGridSize[1],
 			   deviceProp.maxGridSize[2]);
-		printf("  Maximum memory pitch:                          %lu bytes\n", deviceProp.memPitch);
-		printf("  Texture alignment:                             %lu bytes\n", deviceProp.textureAlignment);
-		printf("  Clock rate:                                    %.2f GHz\n", deviceProp.clockRate * 1e-6f);
+		printf("  %-50s: %llu bytes\n", "Maximum memory pitch", deviceProp.memPitch);
+		printf("  %-50s: %llu bytes\n", "Texture alignment", deviceProp.textureAlignment);
+		printf("  %-50s: %.2f GHz\n", "Clock rate", deviceProp.clockRate * 1e-6f);
 	#if CUDART_VERSION >= 2000
-		printf("  Concurrent copy and execution:                 %s\n", deviceProp.deviceOverlap ? "Yes" : "No");
+		printf("  %-50s: %s\n", "Concurrent copy and execution", deviceProp.deviceOverlap ? "Yes" : "No");
 	#endif
 	#if CUDART_VERSION >= 2020
-		printf("  Run time limit on kernels:                     %s\n", deviceProp.kernelExecTimeoutEnabled ? "Yes" : "No");
-		printf("  Integrated:                                    %s\n", deviceProp.integrated ? "Yes" : "No");
-		printf("  Support host page-locked memory mapping:       %s\n", deviceProp.canMapHostMemory ? "Yes" : "No");
-		printf("  Compute mode:                                  %s\n", deviceProp.computeMode == cudaComputeModeDefault ?
+		printf("  %-50s: %s\n", "Run time limit on kernels", deviceProp.kernelExecTimeoutEnabled ? "Yes" : "No");
+		printf("  %-50s: %s\n", "Integrated", deviceProp.integrated ? "Yes" : "No");
+		printf("  %-50s: %s\n", "Support host page-locked memory mapping", deviceProp.canMapHostMemory ? "Yes" : "No");
+		printf("  %-50s: %s\n", "Compute mode", deviceProp.computeMode == cudaComputeModeDefault ?
 																		"Default (multiple host threads can use this device simultaneously)" :
 																		deviceProp.computeMode == cudaComputeModeExclusive ?
 																		"Exclusive (only one host thread at a time can use this device)" :
@@ -523,6 +529,15 @@ __forceinline__  __host__ void destroyTimer(cudaEvent_t &startEvent, cudaEvent_t
 }
 
 
+__forceinline__  __host__ void CUDA_SAFE_CALL(cudaError_t call, int line) 
+{
+	switch (call) {
+	case cudaSuccess:
+		break;
+	default:
+		printf("ERROR at line :%i.%d' ' %s\n", line, call, cudaGetErrorString(call));
+		exit(-1);
+		break;
+	}
+}
 #pragma endregion
-
-#endif
