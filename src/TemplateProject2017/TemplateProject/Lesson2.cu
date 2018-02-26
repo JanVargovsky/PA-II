@@ -2,10 +2,10 @@
 #include <cudaDefs.h>
 
 namespace lesson2 {
-	const size_t N = 10;
-	const size_t Rows = N;
-	const size_t Cols = N;
-	const size_t BlockSize = 8;
+	//const size_t N = 10;
+	const size_t Rows = 10;
+	const size_t Cols = 5;
+	const size_t BlockSize = 2;
 
 	__global__ void fill(int* matrix, size_t rows, size_t cols, size_t pitch)
 	{
@@ -36,17 +36,20 @@ namespace lesson2 {
 	{
 		int *dMatrix;
 		size_t pitchInBytes = 0;
-		size_t rowsInBytes = N * sizeof(int);
-		size_t cols = N;
-		checkCudaErrors(cudaMallocPitch((void**)&dMatrix, &pitchInBytes, rowsInBytes, cols));
+		size_t rowsInBytes = Cols * sizeof(int);
+		checkCudaErrors(cudaMallocPitch((void**)&dMatrix, &pitchInBytes, rowsInBytes, Rows));
 		size_t pitch = pitchInBytes / sizeof(int);
-		dim3 grid = dim3(getNumberOfParts(N, BlockSize), getNumberOfParts(N, BlockSize));
+		dim3 grid = dim3(getNumberOfParts(Rows, BlockSize), getNumberOfParts(Cols, BlockSize));
 		dim3 block = dim3(BlockSize, BlockSize);
 
-		fill << <grid, block >> > (dMatrix, N, N, pitch);
-		checkDeviceMatrix(dMatrix, pitchInBytes, N, N, "%-3d ", "dMatrix");
+		fill << <grid, block >> > (dMatrix, Rows, Cols, pitch);
+		checkDeviceMatrix(dMatrix, pitchInBytes, Cols, Rows, "%-3d ", "dMatrix");
 
-		increment << <grid, block >> > (dMatrix, N, N, pitch);
-		checkDeviceMatrix(dMatrix, pitchInBytes, N, N, "%-3d ", "dMatrix");
+		increment << <grid, block >> > (dMatrix, Rows, Cols, pitch);
+		checkDeviceMatrix(dMatrix, pitchInBytes, Cols, Rows, "%-3d ", "dMatrix");
+
+		int *matrix = new int[Rows * Cols];
+		checkCudaErrors(cudaMemcpy2D(matrix, Rows * sizeof(int), dMatrix, pitchInBytes, Rows * sizeof(int), Cols, cudaMemcpyKind::cudaMemcpyDeviceToHost));
+		checkHostMatrix(matrix, Rows * sizeof(int), Cols, Rows, "%-3d ", "matrix");
 	}
 }
