@@ -25,6 +25,7 @@
     <CudaCompile Include="Lesson2.cu">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </CudaCompile>
+    <CudaCompile Include="Lesson4.cu" />
     <CudaCompile Include="Runner.cu">
       <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compute_61,sm_61</CodeGeneration>
     </CudaCompile>
@@ -33,9 +34,12 @@
     <ClInclude Include="Lesson1.h" />
     <ClInclude Include="Lesson2.h" />
     <ClInclude Include="Lesson3.h" />
+    <ClInclude Include="Lesson4.h" />
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="Lesson3.cu" />
+    <CudaCompile Include="Lesson3.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AD6DD254-AD9D-4168-BF1F-CC32C8CEAD58}</ProjectGuid>
