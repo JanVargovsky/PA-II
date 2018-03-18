@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CudaCompile Include="Lesson1.cu" />
+    <CudaCompile Include="Lesson2.cu" />
+    <CudaCompile Include="Lesson4.cu" />
+    <CudaCompile Include="Runner.cu" />
+    <CudaCompile Include="Lesson3.cu" />
+    <CudaCompile Include="DifferentialEvolution.cu">
+      <Filter>Project</Filter>
+    </CudaCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Lesson1.h" />
+    <ClInclude Include="Lesson2.h" />
+    <ClInclude Include="Lesson3.h" />
+    <ClInclude Include="Lesson4.h" />
+    <ClInclude Include="DifferentialEvolutionRunner.h">
+      <Filter>Project</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Project">
+      <UniqueIdentifier>{977f3733-e1b7-4670-be10-2ef087c2d1f2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DifferentialEvolutionRunner.cu">
+      <Filter>Project</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
