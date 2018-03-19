@@ -27,16 +27,19 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </CudaCompile>
     <CudaCompile Include="Lesson4.cu" />
+    <CudaCompile Include="Lesson5.cu" />
     <CudaCompile Include="Runner.cu">
       <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compute_61,sm_61</CodeGeneration>
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DifferentialEvolutionRunner.h" />
+    <ClInclude Include="imageKernels.cuh" />
     <ClInclude Include="Lesson1.h" />
     <ClInclude Include="Lesson2.h" />
     <ClInclude Include="Lesson3.h" />
     <ClInclude Include="Lesson4.h" />
+    <ClInclude Include="Lesson5.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="Lesson3.cu">

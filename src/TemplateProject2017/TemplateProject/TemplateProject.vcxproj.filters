@@ -9,6 +9,7 @@
     <CudaCompile Include="DifferentialEvolution.cu">
       <Filter>Project</Filter>
     </CudaCompile>
+    <CudaCompile Include="Lesson5.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lesson1.h" />
@@ -18,6 +19,8 @@
     <ClInclude Include="DifferentialEvolutionRunner.h">
       <Filter>Project</Filter>
     </ClInclude>
+    <ClInclude Include="Lesson5.h" />
+    <ClInclude Include="imageKernels.cuh" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Project">
