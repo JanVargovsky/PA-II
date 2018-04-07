@@ -6,30 +6,16 @@
     <CudaCompile Include="Lesson4.cu" />
     <CudaCompile Include="Runner.cu" />
     <CudaCompile Include="Lesson3.cu" />
-    <CudaCompile Include="DifferentialEvolution.cu">
-      <Filter>Project</Filter>
-    </CudaCompile>
     <CudaCompile Include="Lesson5.cu" />
+    <CudaCompile Include="DifferentialEvolutionRunner.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lesson1.h" />
     <ClInclude Include="Lesson2.h" />
     <ClInclude Include="Lesson3.h" />
     <ClInclude Include="Lesson4.h" />
-    <ClInclude Include="DifferentialEvolutionRunner.h">
-      <Filter>Project</Filter>
-    </ClInclude>
     <ClInclude Include="Lesson5.h" />
     <ClInclude Include="imageKernels.cuh" />
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Project">
-      <UniqueIdentifier>{977f3733-e1b7-4670-be10-2ef087c2d1f2}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="DifferentialEvolutionRunner.cu">
-      <Filter>Project</Filter>
-    </ClCompile>
+    <ClInclude Include="DifferentialEvolutionRunner.h" />
   </ItemGroup>
 </Project>
