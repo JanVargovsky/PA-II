@@ -4,7 +4,7 @@
 //#include "Lesson3.h";
 //#include "Lesson4.h";
 //#include "Lesson5.h";
-#include "DifferentialEvolutionRunner.h";
+#include "DifferentialEvolutionRunner.h"
 
 cudaDeviceProp deviceProp = cudaDeviceProp();
 
