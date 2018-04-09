@@ -8,6 +8,7 @@
     <CudaCompile Include="Lesson3.cu" />
     <CudaCompile Include="Lesson5.cu" />
     <CudaCompile Include="DifferentialEvolutionRunner.cu" />
+    <CudaCompile Include="Lesson6.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Lesson1.h" />
@@ -17,5 +18,6 @@
     <ClInclude Include="Lesson5.h" />
     <ClInclude Include="imageKernels.cuh" />
     <ClInclude Include="DifferentialEvolutionRunner.h" />
+    <ClInclude Include="Lesson6.h" />
   </ItemGroup>
 </Project>

@@ -43,6 +43,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CudaCompile>
+    <CudaCompile Include="Lesson6.cu" />
     <CudaCompile Include="Runner.cu">
       <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compute_61,sm_61</CodeGeneration>
     </CudaCompile>
@@ -55,6 +56,7 @@
     <ClInclude Include="Lesson3.h" />
     <ClInclude Include="Lesson4.h" />
     <ClInclude Include="Lesson5.h" />
+    <ClInclude Include="Lesson6.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="Lesson3.cu">
@@ -65,9 +67,7 @@
     </CudaCompile>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="DifferentialEvolutionRunner.cu">
-      <FileType>Document</FileType>
-    </CudaCompile>
+    <CudaCompile Include="DifferentialEvolutionRunner.cu" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AD6DD254-AD9D-4168-BF1F-CC32C8CEAD58}</ProjectGuid>
