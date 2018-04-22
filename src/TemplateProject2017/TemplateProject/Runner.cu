@@ -5,8 +5,8 @@
 //#include "Lesson4.h"
 //#include "Lesson5.h"
 //#include "Lesson6.h"
-#include "Lesson7.h"
-//#include "DifferentialEvolutionRunner.h"
+//#include "Lesson7.h"
+#include "DifferentialEvolutionRunner.h"
 
 cudaDeviceProp deviceProp = cudaDeviceProp();
 
@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
 	//lesson4::run();
 	//lesson5::run();
 	//lesson6::run(argc, argv);
-	lesson7::run();
+	//lesson7::run();
 
-	//Project::run();
+	Project::run();
 	return 0;
 }

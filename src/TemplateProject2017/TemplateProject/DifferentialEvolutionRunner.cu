@@ -90,14 +90,14 @@ constexpr size_t closest_power_of_2(const size_t x)
 
 namespace Project {
 	// dimension of problem (number of parameters)
-	constexpr size_t D = 500; // x
+	constexpr size_t D = 1000; // x
 	// Population size
-	constexpr size_t NP = 500; // y
+	constexpr size_t NP = 1000; // y
 	// differential weight, <0,2>
 	constexpr float F = 0.5f;
 	// crossover probability, <0,1>
 	constexpr float CR = 0.2f;
-	constexpr size_t Iterations = 1000;
+	constexpr size_t Iterations = 30;
 
 	// Parallel reduce
 	constexpr size_t NP2 = closest_power_of_2(NP);
@@ -115,6 +115,7 @@ namespace Project {
 		//printf("tx=%d, ty=%d, index=%d\n", tx, ty, index);
 
 		population[index] = randoms[offset + index] * 10 - 5;
+		//population[index] = index;
 	}
 
 	template<typename T>
@@ -443,11 +444,15 @@ namespace Project {
 		checkCudaErrors(cudaMalloc((void**)&dPopulation2, D * NP * sizeof(T)));
 
 		// generate initial population
+		checkDeviceMatrix(dPopulation, D * sizeof(T), 2, D, "%f ", "dPopulation - initial");
 		KernelRandomPopulation << <ksDE.dimGrid, ksDE.dimBlock >> > (dPopulation, dRandomFloats, randomFloatsOffset);
+		checkError();
+		//checkDeviceMatrix(dPopulation, D * sizeof(T), NP, D, "%f ", "dPopulation - initial");
+		checkDeviceMatrix(dPopulation, D * sizeof(T), 2, D, "%f ", "dPopulation - initial");
+
 		//randomFloatsOffset += NP * D;
 		randomFloatsOffset++;
 		cudaMemset(dPopulation2, 0, NP * D * sizeof(T));
-		//checkDeviceMatrix(dPopulation, D * sizeof(T), NP, D, "%f ", "dPopulation - initial");
 		//checkDeviceMatrix(dPopulation2, D * sizeof(T), NP, D, "%f ", "dPopulation2 - initial");
 		size_t *dIndexOfBest = nullptr;
 		checkCudaErrors(cudaMalloc((void**)&dIndexOfBest, sizeof(size_t)));
@@ -456,6 +461,8 @@ namespace Project {
 		//printf("initial fitnesses\n");
 		//KernelPrintFitnesses << <ksParallelReduce.dimGrid, ksParallelReduce.dimBlock >> > (dPopulation);
 		KernelParallelReduce << <ksParallelReduce.dimGrid, ksParallelReduce.dimBlock >> > (dPopulation, dIndexOfBest);
+		checkError();
+		checkCudaErrors(cudaMemcpy(hIndexOfBest, dIndexOfBest, sizeof(size_t), cudaMemcpyKind::cudaMemcpyDeviceToHost));
 
 		//PrintPopulationWithFitnesses(dPopulation);
 
@@ -465,9 +472,11 @@ namespace Project {
 
 			// Generate next generation
 			KernelNextGeneration << <ksDE.dimGrid, ksDE.dimBlock >> > (dPopulation, dPopulation2, dRandomFloats, randomFloatsOffset);
+			checkError();
 			KernelParallelReduce << <ksParallelReduce.dimGrid, ksParallelReduce.dimBlock >> > (dPopulation2, dIndexOfBest);
-			//checkCudaErrors(cudaMemcpy(hIndexOfBest, dIndexOfBest, sizeof(size_t), cudaMemcpyKind::cudaMemcpyDeviceToHost));
-			//printf("current best fitness is at %u\n", *hIndexOfBest);
+			checkError();
+			checkCudaErrors(cudaMemcpy(hIndexOfBest, dIndexOfBest, sizeof(size_t), cudaMemcpyKind::cudaMemcpyDeviceToHost));
+			printf("current best fitness is at %u\n", *hIndexOfBest);
 
 			//PrintPopulationsWithFitnesses(dPopulation, dPopulation2);
 			//KernelPrintFitnesses << <ksPrintFitnesses.dimGrid, ksPrintFitnesses.dimBlock >> > (dPopulation2);
