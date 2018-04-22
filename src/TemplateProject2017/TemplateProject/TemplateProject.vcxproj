@@ -43,7 +43,11 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CudaCompile>
-    <CudaCompile Include="Lesson6.cu" />
+    <CudaCompile Include="Lesson6.cu">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </CudaCompile>
+    <CudaCompile Include="Lesson7.cu" />
     <CudaCompile Include="Runner.cu">
       <CodeGeneration Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">compute_61,sm_61</CodeGeneration>
     </CudaCompile>
@@ -57,6 +61,7 @@
     <ClInclude Include="Lesson4.h" />
     <ClInclude Include="Lesson5.h" />
     <ClInclude Include="Lesson6.h" />
+    <ClInclude Include="Lesson7.h" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="Lesson3.cu">
@@ -250,7 +255,7 @@ copy "$(FREEGLUT_BIN)\*.dll" "$(OutDir)"
 </Command>
     </PostBuildEvent>
     <CudaCompile>
-      <CodeGeneration>compute_50,sm_50</CodeGeneration>
+      <CodeGeneration>compute_60,sm_60</CodeGeneration>
       <GenerateRelocatableDeviceCode>true</GenerateRelocatableDeviceCode>
       <TargetMachinePlatform>64</TargetMachinePlatform>
     </CudaCompile>
