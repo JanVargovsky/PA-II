@@ -381,7 +381,7 @@ __forceinline__  __host__ bool checkDeviceProperties()
 __forceinline__  __host__ void checkError()
 {
 	cudaError_t err= cudaGetLastError();
-	if (cudaGetLastError() != cudaSuccess)
+	if (err != cudaSuccess)
 	{
 		printf("%s\n", cudaGetErrorString(err));
 	}
